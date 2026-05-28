@@ -25,6 +25,7 @@ app.get("/health", (_req, res) => {
 app.get("/", (_req, res) => {
   res.status(200).render("index", {
     appName: config.appName,
+    sttBackendUrl: config.sttBackendUrl,
     now: new Date().toLocaleString(),
   });
 });

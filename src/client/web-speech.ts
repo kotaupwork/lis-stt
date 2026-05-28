@@ -3,6 +3,20 @@
 
 import { EventEmitter } from "node:events";
 
+type BrowserSpeechRecognition = {
+  language: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onstart: (() => void) | null;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+};
+
 // ────────────────────────────────────────────────
 // Types
 // ────────────────────────────────────────────────
@@ -64,7 +78,7 @@ export interface WebSpeechOptions {
 // ────────────────────────────────────────────────
 
 export class WebSpeechRecognizer extends EventEmitter {
-  private recognition: SpeechRecognition | null = null;
+  private recognition: BrowserSpeechRecognition | null = null;
   private isListening = false;
   private interimTranscript = "";
   private finalTranscript = "";
@@ -91,7 +105,7 @@ export class WebSpeechRecognizer extends EventEmitter {
       throw new Error("Web Speech API not available in this browser");
     }
 
-    this.recognition = new SpeechRecognition();
+    this.recognition = new SpeechRecognition() as BrowserSpeechRecognition;
     this.setupRecognition();
   }
 
@@ -115,7 +129,7 @@ export class WebSpeechRecognizer extends EventEmitter {
     };
 
     // On result (interim + final)
-    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+    this.recognition.onresult = (event: any) => {
       this.interimTranscript = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -142,7 +156,7 @@ export class WebSpeechRecognizer extends EventEmitter {
     };
 
     // On error
-    this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    this.recognition.onerror = (event: any) => {
       this.emit("error", new Error(`Web Speech API error: ${event.error}`));
     };
 

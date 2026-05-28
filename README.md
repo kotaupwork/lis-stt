@@ -16,6 +16,9 @@ cp .env.example .env
 # 3. Run in development mode
 make dev
 
+# 3b. (Phase 2 fallback) Run STT backend for Vosk mode
+uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
 # 4. Validate types/lint
 make build
 make lint
@@ -38,6 +41,7 @@ src/
     index.ejs            Full page response
     partials/
       time.ejs           HTMX fragment response
+    backend/                 Python STT backend (FastAPI + Vosk websocket client)
 docs/                    Developer documentation
 tests/                   Test suite placeholder
 logs/                    Runtime logs
@@ -54,3 +58,17 @@ See [plan.md](plan.md) for feature roadmap (including STT with Web Speech API + 
 - Client action: `hx-get="/partials/time" hx-target="#time-box"`
 
 Use this pattern to build interactive server-rendered features with minimal client JavaScript.
+
+---
+
+## STT Phase 2 Backend
+
+- HTTP chunk endpoint: `POST /api/transcribe`
+- Finalize endpoint: `POST /api/transcribe/finalize`
+- Result stream: `WS /ws/transcribe/{session_id}`
+- Health endpoint: `GET /health`
+
+Environment variables used by frontend/backend:
+
+- `STT_BACKEND_URL` (Node app, default `http://localhost:8000`)
+- `VOSK_WS_URL` (FastAPI backend, default `ws://localhost:2700`)

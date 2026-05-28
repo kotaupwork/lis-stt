@@ -22,6 +22,7 @@
 export const config = {
   appName: process.env.APP_NAME ?? "my-htmx-app",
   port: parseInt(process.env.PORT ?? "3000", 10),
+  sttBackendUrl: process.env.STT_BACKEND_URL ?? "http://localhost:8000",
   nodeEnv: (process.env.NODE_ENV ?? "development") as
     | "development"
     | "production"

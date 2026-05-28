@@ -115,8 +115,8 @@ lis-stt/
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| **1** | Frontend audio recording + Web Speech API | Not Started |
-| **2** | Backend STT endpoints + Vosk integration | Not Started |
+| **1** | Frontend audio recording + Web Speech API | Done |
+| **2** | Backend STT endpoints + Vosk integration | Done |
 | **3** | Docker deployment + local service setup | Not Started |
 | **4** | Integration testing + edge cases | Not Started |
 

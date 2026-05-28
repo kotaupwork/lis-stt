@@ -11,6 +11,11 @@ import { AudioRecorder } from "./audio-recorder.js";
 let sttManager = null;
 let audioRecorder = null;
 let isRecording = false;
+let sessionId = null;
+let voskWs = null;
+let voskPingTimer = null;
+
+const VOSK_BACKEND_BASE = window.STT_BACKEND_URL || "http://localhost:8000";
 
 // ────────────────────────────────────────────────
 // Initialize on DOM ready
@@ -32,11 +37,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Wire up audio recorder events
-  audioRecorder.on("chunk", (chunk) => {
+  audioRecorder.on("chunk", async (chunk) => {
     console.log(
       `[STT] Audio chunk: ${chunk.data.length} samples, seq=${chunk.sequence}`
     );
-    // In Phase 2, will upload to backend here
+
+    if (!sttManager || sttManager.getMode() !== STTMode.VOSK) {
+      return;
+    }
+
+    await uploadChunkToVosk(chunk);
   });
 
   audioRecorder.on("start", () => {
@@ -110,6 +120,11 @@ async function startRecording() {
   try {
     console.log("[STT] Starting recording...");
 
+    if (sttManager.getMode() === STTMode.VOSK) {
+      sessionId = crypto.randomUUID();
+      openVoskSocket(sessionId);
+    }
+
     // Start audio recorder
     await audioRecorder.start();
 
@@ -136,6 +151,12 @@ async function stopRecording() {
     // Stop STT
     await sttManager.stop();
 
+    if (sttManager.getMode() === STTMode.VOSK && sessionId) {
+      await finalizeVoskSession(sessionId);
+      closeVoskSocket();
+      sessionId = null;
+    }
+
     isRecording = false;
     updateRecordButtonUI();
 
@@ -143,6 +164,88 @@ async function stopRecording() {
   } catch (err) {
     console.error("[STT] Failed to stop recording:", err);
     alert(`Error: ${err.message}`);
+  }
+}
+
+async function uploadChunkToVosk(chunk) {
+  if (!sessionId) {
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("session_id", sessionId);
+  formData.append(
+    "audio",
+    new Blob([chunk.data.buffer], { type: "application/octet-stream" }),
+    `chunk-${chunk.sequence}.pcm`
+  );
+
+  const response = await fetch(`${VOSK_BACKEND_BASE}/api/transcribe`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Vosk upload failed (${response.status}): ${body}`);
+  }
+}
+
+async function finalizeVoskSession(id) {
+  const formData = new FormData();
+  formData.append("session_id", id);
+
+  const response = await fetch(`${VOSK_BACKEND_BASE}/api/transcribe/finalize`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Vosk finalize failed (${response.status}): ${body}`);
+  }
+}
+
+function openVoskSocket(id) {
+  const wsUrl = VOSK_BACKEND_BASE.replace("http://", "ws://").replace(
+    "https://",
+    "wss://"
+  );
+
+  voskWs = new WebSocket(`${wsUrl}/ws/transcribe/${id}`);
+
+  voskWs.onopen = () => {
+    console.log("[STT] Connected to Vosk result stream");
+    voskPingTimer = setInterval(() => {
+      if (voskWs && voskWs.readyState === WebSocket.OPEN) {
+        voskWs.send("ping");
+      }
+    }, 10000);
+  };
+
+  voskWs.onmessage = (event) => {
+    try {
+      const payload = JSON.parse(event.data);
+      updateTranscriptUI(payload);
+    } catch (err) {
+      console.warn("[STT] Could not parse Vosk payload", err);
+    }
+  };
+
+  voskWs.onerror = (event) => {
+    console.error("[STT] Vosk websocket error", event);
+  };
+}
+
+function closeVoskSocket() {
+  if (voskPingTimer) {
+    clearInterval(voskPingTimer);
+    voskPingTimer = null;
+  }
+
+  if (voskWs) {
+    voskWs.close();
+    voskWs = null;
   }
 }
 

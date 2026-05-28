@@ -61,7 +61,7 @@ export interface AudioChunk {
 export class AudioRecorder extends EventEmitter {
   private mediaRecorder: MediaRecorder | null = null;
   private audioContext: AudioContext | null = null;
-  private sourceNode: MediaAudioAudioSourceNode | null = null;
+  private sourceNode: MediaStreamAudioSourceNode | null = null;
   private processorNode: ScriptProcessorNode | null = null;
 
   private pcmBuffer: Int16Array[] = [];
@@ -224,7 +224,7 @@ export class AudioRecorder extends EventEmitter {
 
     for (let i = 0; i < float32.length; i++) {
       // Clamp to [-1, 1], then scale to [-32768, 32767]
-      const sample = Math.max(-1, Math.min(1, float32[i]));
+      const sample = Math.max(-1, Math.min(1, float32[i] ?? 0));
       pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
     }
 

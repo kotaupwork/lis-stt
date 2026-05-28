@@ -6,7 +6,10 @@
     <title><%= appName %></title>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <link rel="stylesheet" href="/styles.css" />
-      <script type="module" src="/stt.js"></script>
+    <script>
+      window.STT_BACKEND_URL = "<%= sttBackendUrl %>";
+    </script>
+    <script type="module" src="/stt.js"></script>
   </head>
   <body>
     <main class="container">
@@ -27,24 +30,28 @@
           Refresh Time
         </button>
       </section>
-        <section class="card">
-          <h2>Speech-to-Text</h2>
-          <div class="stt-info">
-            <p>
-              Mode: <span id="stt-mode" class="badge">Initializing...</span>
-            </p>
-          </div>
+      <section class="card">
+        <h2>Speech-to-Text</h2>
+        <div class="stt-info">
+          <p>
+            Mode: <span id="stt-mode" class="badge">Initializing...</span>
+          </p>
+        </div>
 
-          <button id="record-btn" class="btn btn-primary" onclick="window.sttAPI?.toggleRecording()">
-            🎤 Start Recording
-          </button>
+        <button
+          id="record-btn"
+          class="btn btn-primary"
+          onclick="window.sttAPI?.toggleRecording()"
+        >
+          🎤 Start Recording
+        </button>
 
-          <div id="transcript-container" class="card transcript-box">
-            <h3>Transcription</h3>
-            <p id="transcript-interim" class="transcript-interim"></p>
-            <div id="transcript-final" class="transcript-final"></div>
-          </div>
-        </section>
+        <div id="transcript-container" class="card transcript-box">
+          <h3>Transcription</h3>
+          <p id="transcript-interim" class="transcript-interim"></p>
+          <div id="transcript-final" class="transcript-final"></div>
+        </div>
+      </section>
     </main>
   </body>
 </html>

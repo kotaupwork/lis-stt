@@ -18,10 +18,10 @@
 | `src/client/web-speech.js` | Web Speech API wrapper | ✅ Done | Detection + unified result format |
 | `src/client/stt-manager.js` | Unified STT interface | ✅ Done | Web Speech API → Vosk fallback |
 | `src/client/stt.js` | STT browser initialization | ✅ Done | DOM event handlers, UI integration |
-| `backend/app.py` | Python FastAPI server | 🔵 Planned | HTTP + WebSocket routes |
-| `backend/vosk_client.py` | Vosk WebSocket client | 🔵 Planned | Stream audio, receive results |
-| `backend/session_manager.py` | Session tracking | 🔵 Planned | UUID mapping for recordings |
-| `backend/audio_processor.py` | Audio buffering + silence | 🔵 Planned | 500ms buffer, silence detection |
+| `backend/app.py` | Python FastAPI server | ✅ Done | HTTP + WebSocket routes implemented |
+| `backend/vosk_client.py` | Vosk WebSocket client | ✅ Done | Streams PCM chunks and normalizes Vosk results |
+| `backend/session_manager.py` | Session tracking | ✅ Done | Session-to-websocket fanout implemented |
+| `backend/audio_processor.py` | Audio buffering + silence | ✅ Done | 500ms chunk buffer and flush support |
 
 ---
 
@@ -47,7 +47,7 @@
 | B | Fragment route (`/partials/time`) | ✅ Done | htmx-compatible partial response |
 | C | Health route (`/health`) | ✅ Done | JSON heartbeat for uptime checks |
 | D-1 | **Phase 1: Frontend Recording** | ✅ Done | Audio recorder + Web Speech API wrapper |
-| D-2 | **Phase 2: Backend STT Endpoints** | 🔵 Planned | FastAPI routes + Vosk client |
+| D-2 | **Phase 2: Backend STT Endpoints** | ✅ Done | FastAPI routes + Vosk client |
 | D-3 | **Phase 3: Docker Deployment** | 🔵 Planned | Docker Compose + Vosk service |
 | D-4 | **Phase 4: Integration & Testing** | 🔵 Planned | Full cycle testing + edge case handling |
 
@@ -63,3 +63,4 @@
 | 2026-05-28 | Audio buffering at 500ms | Quality > speed; ~0.5s latency acceptable for voice input |
 | 2026-05-28 | HTTP POST (audio) + WebSocket (results) | Clean separation; POST stateless, WebSocket real-time HTMX-native |
 | 2026-05-28 | Python FastAPI backend + Docker Vosk | Best Vosk integration; Vosk service isolated; Node.js frontend stays |
+| 2026-05-28 | 500ms server chunking in backend | Quality-first buffering before Vosk streaming |

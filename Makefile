@@ -7,7 +7,7 @@
 #   choco install make
 # ──────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help scaffold install dev build start test lint format clean
+.PHONY: help scaffold install dev build start test lint format clean backend-install backend-dev
 
 # Default target
 help:
@@ -22,6 +22,8 @@ help:
 	@echo "  test      Run tests"
 	@echo "  lint      Lint with ESLint"
 	@echo "  format    Format with Prettier"
+	@echo "  backend-install Install Python backend dependencies"
+	@echo "  backend-dev Run Python STT backend (FastAPI)"
 	@echo "  clean     Remove logs/ contents"
 	@echo ""
 
@@ -52,6 +54,12 @@ lint:
 
 format:
 	npm run format
+
+backend-install:
+	pip install -r backend/requirements.txt
+
+backend-dev:
+	uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 
 clean:
 	@echo "Cleaning logs/..."

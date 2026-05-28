@@ -70,3 +70,99 @@ p {
 .btn:hover {
   background: var(--accent-strong);
 }
+
+  /* STT Styles */
+
+  .stt-info {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .badge-primary {
+    background: #cce5ff;
+    color: #004099;
+  }
+
+  .badge-warning {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .btn-primary {
+    background: #0066cc;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .btn-primary:hover {
+    background: #0052a3;
+  }
+
+  .btn-primary.recording {
+    background: #dc3545;
+    animation: pulse 1s infinite;
+  }
+
+  .btn-primary.recording:hover {
+    background: #bb2d3b;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.75;
+    }
+  }
+
+  .transcript-box {
+    margin-top: 1.5rem;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 1.25rem;
+    min-height: 120px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .transcript-box h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #transcript-interim {
+    margin: 0.5rem 0;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid #0066cc;
+    color: #0066cc;
+    font-style: italic;
+    background: #f0f6ff;
+    border-radius: 4px;
+  }
+
+  .transcript-final-line {
+    margin: 0.5rem 0;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid #28a745;
+    color: var(--text);
+    background: #f1f9f1;
+    border-radius: 4px;
+  }
+
+  .transcript-final-line:last-child {
+    margin-bottom: 0;
+  }

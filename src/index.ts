@@ -17,7 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/health", (_req, res) => {
-  res.status(200).json({ ok: true, service: config.appName, env: config.nodeEnv });
+  res
+    .status(200)
+    .json({ ok: true, service: config.appName, env: config.nodeEnv });
 });
 
 app.get("/", (_req, res) => {

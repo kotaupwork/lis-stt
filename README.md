@@ -43,7 +43,7 @@ tests/                   Test suite placeholder
 logs/                    Runtime logs
 ```
 
-See [plan.md](plan.md) for backlog ideas and [docs/STATUS.md](docs/STATUS.md) for implementation status.
+See [plan.md](plan.md) for feature roadmap (including STT with Web Speech API + Vosk), and [docs/STATUS.md](docs/STATUS.md) for implementation status.
 
 ---
 

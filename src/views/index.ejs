@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= appName %></title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1><%= appName %></h1>
+      <p>Server-rendered starter with htmx partial updates.</p>
+
+      <section class="card">
+        <h2>Current Time</h2>
+        <div id="time-box" class="time-box">
+          <%- include("partials/time", { now }) %>
+        </div>
+        <button
+          class="btn"
+          hx-get="/partials/time"
+          hx-target="#time-box"
+          hx-swap="innerHTML"
+        >
+          Refresh Time
+        </button>
+      </section>
+    </main>
+  </body>
+</html>

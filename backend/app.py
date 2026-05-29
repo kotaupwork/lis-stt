@@ -5,9 +5,9 @@ import os
 from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from audio_processor import AudioProcessor
-from session_manager import SessionManager
-from vosk_client import VoskClient
+from .audio_processor import AudioProcessor
+from .session_manager import SessionManager
+from .vosk_client import VoskClient
 
 app = FastAPI(title="lis-stt backend", version="0.2.0")
 

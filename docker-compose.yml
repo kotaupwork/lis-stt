@@ -1,0 +1,20 @@
+services:
+  vosk:
+    image: alphacep/kaldi-en:latest
+    container_name: lis-stt-vosk
+    ports:
+      - "2700:2700"
+    restart: unless-stopped
+
+  stt-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lis-stt-backend
+    environment:
+      VOSK_WS_URL: ws://vosk:2700
+    ports:
+      - "8000:8000"
+    depends_on:
+      - vosk
+    restart: unless-stopped

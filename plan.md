@@ -117,7 +117,7 @@ lis-stt/
 |-------|-------|--------|
 | **1** | Frontend audio recording + Web Speech API | Done |
 | **2** | Backend STT endpoints + Vosk integration | Done |
-| **3** | Docker deployment + local service setup | Not Started |
+| **3** | Docker deployment + local service setup | Done |
 | **4** | Integration testing + edge cases | Not Started |
 
 ### Technical Decisions

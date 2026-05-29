@@ -19,6 +19,9 @@ make dev
 # 3b. (Phase 2 fallback) Run STT backend for Vosk mode
 uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 
+# 3c. (Phase 3) Run Vosk + STT backend via Docker
+make docker-up
+
 # 4. Validate types/lint
 make build
 make lint
@@ -41,7 +44,9 @@ src/
     index.ejs            Full page response
     partials/
       time.ejs           HTMX fragment response
-    backend/                 Python STT backend (FastAPI + Vosk websocket client)
+backend/                 Python STT backend (FastAPI + Vosk websocket client)
+docker-compose.yml       Docker Compose stack for Vosk + backend
+Dockerfile               Container image for Python backend
 docs/                    Developer documentation
 tests/                   Test suite placeholder
 logs/                    Runtime logs
@@ -72,3 +77,17 @@ Environment variables used by frontend/backend:
 
 - `STT_BACKEND_URL` (Node app, default `http://localhost:8000`)
 - `VOSK_WS_URL` (FastAPI backend, default `ws://localhost:2700`)
+
+---
+
+## STT Phase 3 Docker Deployment
+
+- Start stack: `make docker-up`
+- Inspect services: `make docker-ps`
+- View logs: `make docker-logs`
+- Stop stack: `make docker-down`
+
+Service endpoints after startup:
+
+- Vosk websocket: `ws://localhost:2700`
+- STT backend: `http://localhost:8000`

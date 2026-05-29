@@ -22,6 +22,9 @@ uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 # 3c. (Phase 3) Run Vosk + STT backend via Docker
 make docker-up
 
+# 3d. (Phase 4) Run backend tests
+make backend-test
+
 # 4. Validate types/lint
 make build
 make lint
@@ -91,3 +94,15 @@ Service endpoints after startup:
 
 - Vosk websocket: `ws://localhost:2700`
 - STT backend: `http://localhost:8000`
+
+---
+
+## STT Phase 4 Integration Notes
+
+- Frontend now retries Vosk chunk uploads with short backoff before failing.
+- STT UI exposes non-blocking status messages (info/success/warn/error) instead of alerts.
+- Backend endpoints guard error paths and return `503` when Vosk is unavailable.
+- Backend tests cover:
+  - 500ms audio chunking behavior
+  - Vosk payload normalization
+  - Health and empty-audio transcribe behavior

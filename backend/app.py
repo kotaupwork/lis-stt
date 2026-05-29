@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 
+from fastapi import HTTPException
+
 from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,12 +43,34 @@ async def transcribe_chunk(
     resolved_session = session_manager.ensure_session(session_id)
     payload = await audio.read()
 
+    if not payload:
+        return {
+            "ok": True,
+            "sessionId": resolved_session,
+            "bufferedBytes": 0,
+            "resultsSent": 0,
+        }
+
     results_sent = 0
-    for chunk in audio_processor.append(resolved_session, payload):
-        results = await vosk_client.send_audio(resolved_session, chunk)
-        for item in results:
-            await session_manager.publish(resolved_session, item)
-            results_sent += 1
+    try:
+        for chunk in audio_processor.append(resolved_session, payload):
+            results = await vosk_client.send_audio(resolved_session, chunk)
+            for item in results:
+                await session_manager.publish(resolved_session, item)
+                results_sent += 1
+    except Exception as exc:
+        await session_manager.publish(
+            resolved_session,
+            {
+                "source": "vosk",
+                "isFinal": False,
+                "interim": "",
+                "final": "",
+                "confidence": 0.0,
+                "error": f"transcribe_chunk_failed: {exc}",
+            },
+        )
+        raise HTTPException(status_code=503, detail="Vosk transcription unavailable") from exc
 
     return {
         "ok": True,
@@ -63,16 +87,30 @@ async def finalize_transcription(session_id: str = Form(...)) -> dict:
     remaining = audio_processor.flush(resolved_session)
     results_sent = 0
 
-    if remaining:
-        results = await vosk_client.send_audio(resolved_session, remaining)
-        for item in results:
+    try:
+        if remaining:
+            results = await vosk_client.send_audio(resolved_session, remaining)
+            for item in results:
+                await session_manager.publish(resolved_session, item)
+                results_sent += 1
+
+        final_results = await vosk_client.finalize(resolved_session)
+        for item in final_results:
             await session_manager.publish(resolved_session, item)
             results_sent += 1
-
-    final_results = await vosk_client.finalize(resolved_session)
-    for item in final_results:
-        await session_manager.publish(resolved_session, item)
-        results_sent += 1
+    except Exception as exc:
+        await session_manager.publish(
+            resolved_session,
+            {
+                "source": "vosk",
+                "isFinal": False,
+                "interim": "",
+                "final": "",
+                "confidence": 0.0,
+                "error": f"finalize_failed: {exc}",
+            },
+        )
+        raise HTTPException(status_code=503, detail="Vosk finalize unavailable") from exc
 
     return {
         "ok": True,
@@ -91,4 +129,6 @@ async def ws_transcribe(websocket: WebSocket, session_id: str) -> None:
             # Keep socket alive and allow future client control messages.
             await websocket.receive_text()
     except WebSocketDisconnect:
+        await session_manager.disconnect(session_id, websocket)
+    except Exception:
         await session_manager.disconnect(session_id, websocket)

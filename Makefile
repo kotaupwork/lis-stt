@@ -7,7 +7,7 @@
 #   choco install make
 # ──────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help scaffold install dev build start test lint format clean backend-install backend-dev docker-up docker-down docker-logs docker-ps
+.PHONY: help scaffold install dev build start test lint format clean backend-install backend-dev backend-test docker-up docker-down docker-logs docker-ps
 
 # Default target
 help:
@@ -24,6 +24,7 @@ help:
 	@echo "  format    Format with Prettier"
 	@echo "  backend-install Install Python backend dependencies"
 	@echo "  backend-dev Run Python STT backend (FastAPI)"
+	@echo "  backend-test Run Python backend tests (Phase 4)"
 	@echo "  docker-up Start Vosk + backend services with Docker Compose"
 	@echo "  docker-down Stop Docker Compose services"
 	@echo "  docker-logs Tail Docker Compose logs"
@@ -64,6 +65,9 @@ backend-install:
 
 backend-dev:
 	uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
+backend-test:
+	python -m pytest backend/tests -q
 
 docker-up:
 	docker compose up -d --build

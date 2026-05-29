@@ -166,3 +166,36 @@ p {
   .transcript-final-line:last-child {
     margin-bottom: 0;
   }
+
+  .stt-status {
+    margin: 1rem 0 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    min-height: 2.3rem;
+    font-size: 0.92rem;
+  }
+
+  .stt-status-info {
+    background: #eef6ff;
+    color: #1a4e8a;
+    border-color: #c5defe;
+  }
+
+  .stt-status-success {
+    background: #e9f8ee;
+    color: #1f6b39;
+    border-color: #bde9cb;
+  }
+
+  .stt-status-warn {
+    background: #fff8e8;
+    color: #7a5b11;
+    border-color: #f5e2a6;
+  }
+
+  .stt-status-error {
+    background: #fdeeee;
+    color: #8a1e1e;
+    border-color: #f3c5c5;
+  }

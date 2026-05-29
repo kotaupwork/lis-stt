@@ -14,8 +14,10 @@ let isRecording = false;
 let sessionId = null;
 let voskWs = null;
 let voskPingTimer = null;
+let isStopping = false;
 
 const VOSK_BACKEND_BASE = window.STT_BACKEND_URL || "http://localhost:8000";
+const MAX_UPLOAD_RETRIES = 3;
 
 // ────────────────────────────────────────────────
 // Initialize on DOM ready
@@ -119,6 +121,9 @@ async function toggleRecording() {
 async function startRecording() {
   try {
     console.log("[STT] Starting recording...");
+    isStopping = false;
+    clearTranscriptUI();
+    setStatus("", "info");
 
     if (sttManager.getMode() === STTMode.VOSK) {
       sessionId = crypto.randomUUID();
@@ -133,17 +138,23 @@ async function startRecording() {
 
     isRecording = true;
     updateRecordButtonUI();
+    setStatus("Recording in progress...", "info");
 
     console.log("[STT] Recording and STT started");
   } catch (err) {
     console.error("[STT] Failed to start recording:", err);
-    alert(`Error: ${err.message}`);
+    setStatus(`Failed to start recording: ${err.message}`, "error");
+    isRecording = false;
+    updateRecordButtonUI();
+    closeVoskSocket();
+    sessionId = null;
   }
 }
 
 async function stopRecording() {
   try {
     console.log("[STT] Stopping recording...");
+    isStopping = true;
 
     // Stop audio recorder
     await audioRecorder.stop();
@@ -159,16 +170,23 @@ async function stopRecording() {
 
     isRecording = false;
     updateRecordButtonUI();
+    setStatus("Recording stopped.", "info");
 
     console.log("[STT] Recording and STT stopped");
   } catch (err) {
     console.error("[STT] Failed to stop recording:", err);
-    alert(`Error: ${err.message}`);
+    setStatus(`Failed to stop recording: ${err.message}`, "error");
+    closeVoskSocket();
+    sessionId = null;
+    isRecording = false;
+    updateRecordButtonUI();
+  } finally {
+    isStopping = false;
   }
 }
 
 async function uploadChunkToVosk(chunk) {
-  if (!sessionId) {
+  if (!sessionId || isStopping) {
     return;
   }
 
@@ -180,14 +198,37 @@ async function uploadChunkToVosk(chunk) {
     `chunk-${chunk.sequence}.pcm`
   );
 
-  const response = await fetch(`${VOSK_BACKEND_BASE}/api/transcribe`, {
-    method: "POST",
-    body: formData,
-  });
+  let attempt = 0;
+  let lastError = null;
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Vosk upload failed (${response.status}): ${body}`);
+  while (attempt < MAX_UPLOAD_RETRIES) {
+    attempt += 1;
+    try {
+      const response = await fetch(`${VOSK_BACKEND_BASE}/api/transcribe`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`Vosk upload failed (${response.status}): ${body}`);
+      }
+
+      if (attempt > 1) {
+        setStatus("Connection restored.", "success");
+      }
+      return;
+    } catch (err) {
+      lastError = err;
+      if (attempt < MAX_UPLOAD_RETRIES) {
+        setStatus(`Upload issue, retrying (${attempt}/${MAX_UPLOAD_RETRIES - 1})...`, "warn");
+        await delay(250 * attempt);
+      }
+    }
+  }
+
+  if (lastError) {
+    setStatus(`Upload failed after retries: ${lastError.message}`, "error");
   }
 }
 
@@ -216,6 +257,7 @@ function openVoskSocket(id) {
 
   voskWs.onopen = () => {
     console.log("[STT] Connected to Vosk result stream");
+    setStatus("Connected to Vosk result stream.", "success");
     voskPingTimer = setInterval(() => {
       if (voskWs && voskWs.readyState === WebSocket.OPEN) {
         voskWs.send("ping");
@@ -234,6 +276,13 @@ function openVoskSocket(id) {
 
   voskWs.onerror = (event) => {
     console.error("[STT] Vosk websocket error", event);
+    setStatus("WebSocket error while receiving transcripts.", "error");
+  };
+
+  voskWs.onclose = () => {
+    if (isRecording && !isStopping) {
+      setStatus("WebSocket closed unexpectedly. Stop and restart recording.", "warn");
+    }
   };
 }
 
@@ -286,6 +335,31 @@ function updateTranscriptUI(result) {
       interimEl.textContent = "";
     }
   }
+}
+
+function clearTranscriptUI() {
+  const interimEl = document.getElementById("transcript-interim");
+  const finalEl = document.getElementById("transcript-final");
+
+  if (interimEl) {
+    interimEl.textContent = "";
+  }
+
+  if (finalEl) {
+    finalEl.innerHTML = "";
+  }
+}
+
+function setStatus(message, level = "info") {
+  const statusEl = document.getElementById("stt-status");
+  if (!statusEl) return;
+
+  statusEl.textContent = message;
+  statusEl.className = `stt-status stt-status-${level}`;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // ────────────────────────────────────────────────

@@ -24,6 +24,7 @@
 | `backend/audio_processor.py` | Audio buffering + silence | ✅ Done | 500ms chunk buffer and flush support |
 | `docker-compose.yml` | Service orchestration | ✅ Done | Vosk + STT backend stack |
 | `Dockerfile` | Backend container image | ✅ Done | FastAPI service image build |
+| `backend/tests/*` | Backend validation tests | ✅ Done | Buffering, normalization, health/transcribe basics |
 
 ---
 
@@ -51,7 +52,7 @@
 | D-1 | **Phase 1: Frontend Recording** | ✅ Done | Audio recorder + Web Speech API wrapper |
 | D-2 | **Phase 2: Backend STT Endpoints** | ✅ Done | FastAPI routes + Vosk client |
 | D-3 | **Phase 3: Docker Deployment** | ✅ Done | Docker Compose + Vosk service |
-| D-4 | **Phase 4: Integration & Testing** | 🔵 Planned | Full cycle testing + edge case handling |
+| D-4 | **Phase 4: Integration & Testing** | ✅ Done | Retry logic, error UX, backend tests, endpoint resilience |
 
 ---
 
@@ -67,3 +68,4 @@
 | 2026-05-28 | Python FastAPI backend + Docker Vosk | Best Vosk integration; Vosk service isolated; Node.js frontend stays |
 | 2026-05-28 | 500ms server chunking in backend | Quality-first buffering before Vosk streaming |
 | 2026-05-29 | Docker Compose for local STT stack | One-command startup for backend + Vosk service |
+| 2026-05-29 | Upload retries + status banner in STT UI | Better resilience and user feedback under network/backend failures |

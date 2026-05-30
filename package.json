@@ -4,9 +4,12 @@
   "description": "Server-rendered htmx starter with TypeScript",
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "npm run typecheck",
+    "typecheck": "tsc --noEmit",
+    "build:prod": "tsc -p tsconfig.json && node tools/prepare-dist.mjs",
     "dev": "node --watch --import tsx/esm src/index.ts",
     "start": "node --import tsx/esm src/index.ts",
+    "start:prod": "node dist/index.js",
     "test": "node --test tests/**/*.test.js",
     "lint": "eslint src/ tests/",
     "format": "prettier --write src/ tests/"

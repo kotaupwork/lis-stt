@@ -108,6 +108,8 @@ lis-stt/
   │
   ├── docker-compose.yml             # NEW: Vosk + backend services
   ├── Dockerfile                     # NEW: Python backend container
+  ├── tools/generate_test_audio.py   # NEW: Create test mp3 samples (SR/EN)
+  ├── src/public/audio-samples/      # NEW: Generated sample audio clips
   └── (existing files remain)
 ```
 
@@ -119,6 +121,14 @@ lis-stt/
 | **2** | Backend STT endpoints + Vosk integration | Done |
 | **3** | Docker deployment + local service setup | Done |
 | **4** | Integration testing + edge cases | Done |
+| **5** | Production containers + GHCR prebuilt images (frontend/backend), image pull deployment, smaller runtime dependencies | In Progress |
+| **6** | Integration with other services (DB storage, JSON/PDF export) | Planned |
+| **7** | Request validation helper for form endpoints | Planned |
+| **8** | CSRF strategy examples for form posts | Planned |
+| **9** | Integration tests for fragment routes | Planned |
+| **10** | Deterministic transcript snapshots for the 4 sample audio clips | Planned |
+| **11** | Multi-language support (language selector, multiple Vosk models) | Planned |
+| **12** | Audio quality metrics (WER, confidence scores, visualization) | Planned |
 
 ### Technical Decisions
 
@@ -133,13 +143,3 @@ lis-stt/
 | **Deployment** | Docker (Vosk) + Node.js (backend) | Vosk isolated; backend stays Node.js |
 | **Fallback strategy** | Automatic (transparent) | Web Speech API if available, Vosk fallback |
 
----
-
-## Backlog
-
-- Add request validation helper for form endpoints.
-- Add CSRF strategy examples for form posts.
-- Add integration tests for fragment routes.
-- **STT Phase 5:** Integration with other services (DB storage, JSON/PDF export).
-- **STT Phase 6:** Multi-language support (language selector, multiple Vosk models).
-- **STT Phase 7:** Audio quality metrics (WER, confidence scores, visualization).

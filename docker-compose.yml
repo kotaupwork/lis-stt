@@ -32,6 +32,32 @@ services:
       - "2701:2700"
     restart: unless-stopped
 
+  vosk-en-small:
+    profiles: ["en-plus"]
+    build:
+      context: .
+      dockerfile: Dockerfile.vosk-slavic
+      args:
+        MODEL_URL: ${VOSK_MODEL_URL_EN_SMALL:-https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip}
+        MODEL_DIRNAME: ${VOSK_MODEL_DIRNAME_EN_SMALL:-vosk-model-small-en-us-0.15}
+    container_name: lis-stt-vosk-en-small
+    ports:
+      - "2703:2700"
+    restart: unless-stopped
+
+  vosk-en-large:
+    profiles: ["en-plus"]
+    build:
+      context: .
+      dockerfile: Dockerfile.vosk-slavic
+      args:
+        MODEL_URL: ${VOSK_MODEL_URL_EN_LARGE:-https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip}
+        MODEL_DIRNAME: ${VOSK_MODEL_DIRNAME_EN_LARGE:-vosk-model-en-us-0.22}
+    container_name: lis-stt-vosk-en-large
+    ports:
+      - "2704:2700"
+    restart: unless-stopped
+
   vosk-sh:
     profiles: ["sh"]
     build:
@@ -51,6 +77,8 @@ services:
     environment:
       VOSK_DEFAULT_MODEL: en
       VOSK_WS_URL_EN: ws://vosk-en:2700
+      VOSK_WS_URL_EN_SMALL: ws://vosk-en-small:2700
+      VOSK_WS_URL_EN_LARGE: ws://vosk-en-large:2700
       VOSK_WS_URL_SR: ws://vosk-sr:2700
       VOSK_WS_URL_SH: ws://vosk-sh:2700
     ports:

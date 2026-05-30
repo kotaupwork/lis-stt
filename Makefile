@@ -156,8 +156,13 @@ docker-up:
 		echo "Start Docker Desktop and ensure WSL integration is enabled for this distro."; \
 		exit 1; \
 	fi; \
-	"$$DCMD" compose pull; \
-	"$$DCMD" compose up -d
+	if "$$DCMD" compose pull; then \
+		"$$DCMD" compose up -d; \
+	else \
+		echo "compose pull failed (possibly private or missing GHCR image)."; \
+		echo "Falling back to local build for frontend/backend."; \
+		"$$DCMD" compose up -d --build; \
+	fi
 
 docker-up-sr:
 	@set -e; \
@@ -176,8 +181,13 @@ docker-up-sr:
 		echo "Start Docker Desktop and ensure WSL integration is enabled for this distro."; \
 		exit 1; \
 	fi; \
-	"$$DCMD" compose --profile sr pull; \
-	"$$DCMD" compose --profile sr up -d
+	if "$$DCMD" compose --profile sr pull; then \
+		"$$DCMD" compose --profile sr up -d; \
+	else \
+		echo "compose pull failed (possibly private or missing GHCR image)."; \
+		echo "Falling back to local build for frontend/backend and profile services."; \
+		"$$DCMD" compose --profile sr up -d --build; \
+	fi
 
 docker-up-sh:
 	@set -e; \
@@ -196,8 +206,13 @@ docker-up-sh:
 		echo "Start Docker Desktop and ensure WSL integration is enabled for this distro."; \
 		exit 1; \
 	fi; \
-	"$$DCMD" compose --profile sh pull; \
-	"$$DCMD" compose --profile sh up -d
+	if "$$DCMD" compose --profile sh pull; then \
+		"$$DCMD" compose --profile sh up -d; \
+	else \
+		echo "compose pull failed (possibly private or missing GHCR image)."; \
+		echo "Falling back to local build for frontend/backend and profile services."; \
+		"$$DCMD" compose --profile sh up -d --build; \
+	fi
 
 docker-up-slavic:
 	@set -e; \
@@ -216,8 +231,13 @@ docker-up-slavic:
 		echo "Start Docker Desktop and ensure WSL integration is enabled for this distro."; \
 		exit 1; \
 	fi; \
-	"$$DCMD" compose --profile sr --profile sh pull; \
-	"$$DCMD" compose --profile sr --profile sh up -d
+	if "$$DCMD" compose --profile sr --profile sh pull; then \
+		"$$DCMD" compose --profile sr --profile sh up -d; \
+	else \
+		echo "compose pull failed (possibly private or missing GHCR image)."; \
+		echo "Falling back to local build for frontend/backend and profile services."; \
+		"$$DCMD" compose --profile sr --profile sh up -d --build; \
+	fi
 
 docker-down:
 	@set -e; \

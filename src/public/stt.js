@@ -18,6 +18,8 @@ let isStopping = false;
 let finalTranscriptText = "";
 let selectedModel = "en";
 let activeModel = "en";
+let selectedSensitivity = "balanced";
+let activeSensitivity = "balanced";
 
 const VOSK_BACKEND_BASE = window.STT_BACKEND_URL || "http://localhost:8000";
 const MAX_UPLOAD_RETRIES = 3;
@@ -111,6 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const readiness = await ensureBackendAvailable();
   initializeModelSelector(readiness);
+  initializeSensitivitySelector();
 
   if (mode === STTMode.VOSK) {
     if (!readiness.ok) {
@@ -168,6 +171,7 @@ async function startRecording() {
       }
 
       activeModel = getSelectedModel();
+      activeSensitivity = getSelectedSensitivity();
       if (!isModelReady(readiness, activeModel)) {
         throw new Error(
           `Model '${activeModel}' is unavailable. Start make docker-up or select a model that is ready.`
@@ -245,6 +249,7 @@ async function uploadChunkToVosk(chunk) {
   const formData = new FormData();
   formData.append("session_id", sessionId);
   formData.append("model", activeModel);
+  formData.append("sensitivity", activeSensitivity);
   formData.append(
     "audio",
     new Blob([chunk.data.buffer.slice(0)], { type: "application/octet-stream" }),
@@ -305,6 +310,7 @@ async function runSample(url, label = "sample") {
     }
 
     activeModel = getSelectedModel();
+    activeSensitivity = getSelectedSensitivity();
     if (!isModelReady(readiness, activeModel)) {
       throw new Error(
         `Model '${activeModel}' is unavailable. Start make docker-up or select a model that is ready.`
@@ -360,6 +366,7 @@ async function uploadPcmChunk(pcm, index) {
   const formData = new FormData();
   formData.append("session_id", sessionId);
   formData.append("model", activeModel);
+  formData.append("sensitivity", activeSensitivity);
   formData.append(
     "audio",
     new Blob([pcm.buffer.slice(0)], { type: "application/octet-stream" }),
@@ -420,6 +427,7 @@ async function finalizeVoskSession(id) {
   const formData = new FormData();
   formData.append("session_id", id);
   formData.append("model", activeModel);
+  formData.append("sensitivity", activeSensitivity);
 
   const response = await fetch(`${VOSK_BACKEND_BASE}/api/transcribe/finalize`, {
     method: "POST",
@@ -537,6 +545,27 @@ function getSelectedModel() {
   return (select?.value || selectedModel || "en").toLowerCase();
 }
 
+function initializeSensitivitySelector() {
+  const select = document.getElementById("sensitivity-select");
+  if (!select) return;
+
+  selectedSensitivity = (select.value || "balanced").toLowerCase();
+  activeSensitivity = selectedSensitivity;
+
+  select.addEventListener("change", () => {
+    selectedSensitivity = (select.value || "balanced").toLowerCase();
+    activeSensitivity = selectedSensitivity;
+    updateSensitivityHint(selectedSensitivity);
+  });
+
+  updateSensitivityHint(selectedSensitivity);
+}
+
+function getSelectedSensitivity() {
+  const select = document.getElementById("sensitivity-select");
+  return (select?.value || selectedSensitivity || "balanced").toLowerCase();
+}
+
 function isModelReady(readiness, model) {
   if (!readiness?.ok) return false;
   const meta = readiness.models?.[model];
@@ -571,8 +600,25 @@ function applyWebSpeechLanguageForModel(model) {
     return;
   }
 
-  const language = model === "en" ? "en-US" : "sr-RS";
+  const language = model.startsWith("en") ? "en-US" : "sr-RS";
   sttManager.setLanguage(language);
+}
+
+function updateSensitivityHint(sensitivity) {
+  const hint = document.getElementById("sensitivity-hint");
+  if (!hint) return;
+
+  if (sensitivity === "high") {
+    hint.textContent = "High sensitivity: captures quieter speech, may include more background noise.";
+    return;
+  }
+
+  if (sensitivity === "low") {
+    hint.textContent = "Low sensitivity: filters noise more aggressively, requires louder speech.";
+    return;
+  }
+
+  hint.textContent = "Balanced sensitivity: recommended default for most microphones.";
 }
 
 function closeVoskSocket() {

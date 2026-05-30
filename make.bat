@@ -169,7 +169,12 @@ goto :end
 
 :docker_up
 docker compose pull
-if errorlevel 1 exit /b %errorlevel%
+if errorlevel 1 (
+    echo compose pull failed (possibly private or missing GHCR image).
+    echo Falling back to local build for frontend/backend.
+    docker compose up -d --build
+    goto :end
+)
 docker compose up -d
 goto :end
 

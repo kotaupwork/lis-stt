@@ -26,17 +26,29 @@ app.get("/", (_req, res) => {
   res.status(200).render("index", {
     appName: config.appName,
     sttBackendUrl: config.sttBackendUrl,
-    now: new Date().toLocaleString(),
   });
 });
 
-app.get("/partials/time", (_req, res) => {
-  res.status(200).render("partials/time", {
-    now: new Date().toLocaleString(),
-  });
-});
+const MAX_PORT_ATTEMPTS = 20;
 
-app.listen(config.port, () => {
-  logger.info(`Starting ${config.appName} (${config.nodeEnv})`);
-  logger.info(`Listening on http://localhost:${config.port}`);
-});
+function startServer(port: number, attempt = 0): void {
+  const server = app.listen(port, () => {
+    logger.info(`Starting ${config.appName} (${config.nodeEnv})`);
+    logger.info(`Listening on http://localhost:${port}`);
+  });
+
+  server.on("error", (err: unknown) => {
+    const error = err as NodeJS.ErrnoException;
+
+    if (error.code === "EADDRINUSE" && attempt < MAX_PORT_ATTEMPTS) {
+      const nextPort = port + 1;
+      logger.warn(`Port ${port} is busy. Retrying on ${nextPort}...`);
+      startServer(nextPort, attempt + 1);
+      return;
+    }
+
+    throw err;
+  });
+}
+
+startServer(config.port);

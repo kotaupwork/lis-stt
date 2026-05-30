@@ -87,6 +87,8 @@ Environment variables used by frontend/backend:
 - `STT_BACKEND_URL` (Node app, default `http://localhost:8000`)
 - `VOSK_DEFAULT_MODEL` (FastAPI backend default model key, default `en`)
 - `VOSK_WS_URL_EN` (FastAPI -> English Vosk websocket, default `ws://localhost:2700`)
+- `VOSK_WS_URL_EN_SMALL` (FastAPI -> English small model websocket, default `ws://localhost:2703`)
+- `VOSK_WS_URL_EN_LARGE` (FastAPI -> English large model websocket, default `ws://localhost:2704`)
 - `VOSK_WS_URL_SR` (FastAPI -> Serbian Vosk websocket, default `ws://localhost:2701`)
 - `VOSK_WS_URL_SH` (FastAPI -> Serbo-Croatian Vosk websocket, default `ws://localhost:2702`)
 
@@ -106,6 +108,10 @@ Optional slavic model containers are profile-gated:
 - `docker compose --profile sh pull && docker compose --profile sh up -d` (Serbo-Croatian model container)
 - `docker compose --profile sr --profile sh pull && docker compose --profile sr --profile sh up -d` (both)
 
+Optional additional English model containers are profile-gated:
+
+- `docker compose --profile en-plus pull && docker compose --profile en-plus up -d`
+
 Frontend/backend containers are now expected to come from GitHub Container Registry (GHCR):
 
 - `ghcr.io/kotaupwork/lis-stt/frontend:<tag>`
@@ -123,6 +129,12 @@ Service endpoints after startup:
 - STT backend: `http://localhost:8000`
 
 The STT card now includes a `Vosk Model` dropdown. Selected values (`en`, `sr`, `sh`) are sent on chunk/finalize requests so live and sample transcription use the chosen model.
+
+The STT card now also includes `Microphone Sensitivity` presets:
+
+- `High`: quieter speech capture, larger context window
+- `Balanced`: default tuning for most microphones
+- `Low`: stronger background-noise filtering
 
 ---
 

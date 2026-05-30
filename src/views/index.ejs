@@ -8,28 +8,34 @@
     <link rel="stylesheet" href="/styles.css" />
     <script>
       window.STT_BACKEND_URL = "<%= sttBackendUrl %>";
+
+      (() => {
+        const storedTheme = localStorage.getItem("theme");
+        const preferredDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const initialTheme = storedTheme ?? (preferredDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", initialTheme);
+      })();
+
+      window.toggleTheme = () => {
+        const current = document.documentElement.getAttribute("data-theme") ?? "light";
+        const next = current === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      };
     </script>
     <script type="module" src="/stt.js"></script>
   </head>
   <body>
     <main class="container">
+      <div class="toolbar">
+        <button class="btn theme-toggle" onclick="window.toggleTheme()">
+          Toggle Theme
+        </button>
+      </div>
+
       <h1><%= appName %></h1>
       <p>Server-rendered starter with htmx partial updates.</p>
 
-      <section class="card">
-        <h2>Current Time</h2>
-        <div id="time-box" class="time-box">
-          <%- include("partials/time", { now }) %>
-        </div>
-        <button
-          class="btn"
-          hx-get="/partials/time"
-          hx-target="#time-box"
-          hx-swap="innerHTML"
-        >
-          Refresh Time
-        </button>
-      </section>
       <section class="card">
         <h2>Speech-to-Text</h2>
         <div class="stt-info">
@@ -40,10 +46,22 @@
             <label for="model-select">Vosk Model</label>
             <select id="model-select" class="model-select">
               <option value="en" selected>English (kaldi-en)</option>
+              <option value="en_small">English Small (vosk-model-small-en-us-0.15)</option>
+              <option value="en_large">English Large (vosk-model-en-us-0.22)</option>
               <option value="sr">Serbian (vosk-model-small-sr-0.4)</option>
               <option value="sh">Serbo-Croatian (vosk-model-small-sh-0.4)</option>
             </select>
             <p id="model-hint" class="model-hint">Checking backend model availability...</p>
+
+            <label for="sensitivity-select">Microphone Sensitivity</label>
+            <select id="sensitivity-select" class="model-select">
+              <option value="high">High (captures quieter speech)</option>
+              <option value="balanced" selected>Balanced</option>
+              <option value="low">Low (filters more background noise)</option>
+            </select>
+            <p id="sensitivity-hint" class="model-hint">
+              Sensitivity controls Vosk audio gating and analysis window.
+            </p>
           </div>
         </div>
 

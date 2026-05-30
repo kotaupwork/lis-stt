@@ -8,6 +8,16 @@
   --border: #d9dfef;
 }
 
+:root[data-theme="dark"] {
+  --bg: #0f1624;
+  --surface: #172235;
+  --text: #e4ecff;
+  --muted: #9bb0d9;
+  --accent: #33a2a9;
+  --accent-strong: #2b7e84;
+  --border: #2a3958;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -19,10 +29,20 @@ body {
   background: radial-gradient(circle at top right, #d7eef0, var(--bg) 38%);
 }
 
+:root[data-theme="dark"] body {
+  background: radial-gradient(circle at top right, #1d2a41, var(--bg) 40%);
+}
+
 .container {
   max-width: 720px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
 }
 
 h1 {
@@ -42,20 +62,6 @@ p {
   padding: 1.25rem;
 }
 
-.time-box {
-  margin: 1rem 0;
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-  border: 1px dashed var(--border);
-  background: #fbfdff;
-}
-
-.time-value {
-  margin: 0;
-  color: var(--text);
-  font-weight: 600;
-}
-
 .btn {
   border: 0;
   border-radius: 10px;
@@ -69,6 +75,16 @@ p {
 
 .btn:hover {
   background: var(--accent-strong);
+}
+
+.theme-toggle {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.theme-toggle:hover {
+  background: rgba(127, 148, 203, 0.15);
 }
 
   /* STT Styles */
@@ -93,7 +109,7 @@ p {
 
   .model-select {
     border: 1px solid var(--border);
-    background: #fff;
+    background: var(--surface);
     color: var(--text);
     border-radius: 8px;
     padding: 0.5rem 0.65rem;
@@ -115,13 +131,13 @@ p {
   }
 
   .badge-primary {
-    background: #cce5ff;
-    color: #004099;
+    background: rgba(80, 154, 255, 0.2);
+    color: #6ab0ff;
   }
 
   .badge-warning {
-    background: #fff3cd;
-    color: #856404;
+    background: rgba(255, 213, 79, 0.22);
+    color: #ffd36e;
   }
 
   .btn-primary {
@@ -154,8 +170,8 @@ p {
 
   .transcript-box {
     margin-top: 1.5rem;
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
+    background: rgba(136, 167, 237, 0.08);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 1.25rem;
     min-height: 120px;
@@ -176,9 +192,9 @@ p {
     margin: 0.5rem 0;
     padding: 0.5rem 0.75rem;
     border-left: 3px solid #0066cc;
-    color: #0066cc;
+    color: #6ab0ff;
     font-style: italic;
-    background: #f0f6ff;
+    background: rgba(80, 154, 255, 0.16);
     border-radius: 4px;
   }
 
@@ -187,7 +203,7 @@ p {
     padding: 0.5rem 0.75rem;
     border-left: 3px solid #28a745;
     color: var(--text);
-    background: #f1f9f1;
+    background: rgba(73, 209, 122, 0.14);
     border-radius: 4px;
   }
 
@@ -205,27 +221,27 @@ p {
   }
 
   .stt-status-info {
-    background: #eef6ff;
-    color: #1a4e8a;
-    border-color: #c5defe;
+    background: rgba(80, 154, 255, 0.18);
+    color: #9cc6ff;
+    border-color: rgba(80, 154, 255, 0.34);
   }
 
   .stt-status-success {
-    background: #e9f8ee;
-    color: #1f6b39;
-    border-color: #bde9cb;
+    background: rgba(73, 209, 122, 0.14);
+    color: #8de8ae;
+    border-color: rgba(73, 209, 122, 0.34);
   }
 
   .stt-status-warn {
-    background: #fff8e8;
-    color: #7a5b11;
-    border-color: #f5e2a6;
+    background: rgba(255, 213, 79, 0.14);
+    color: #ffdc83;
+    border-color: rgba(255, 213, 79, 0.36);
   }
 
   .stt-status-error {
-    background: #fdeeee;
-    color: #8a1e1e;
-    border-color: #f3c5c5;
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff9d9d;
+    border-color: rgba(255, 107, 107, 0.35);
   }
 
   .sample-audio-panel {
@@ -233,7 +249,7 @@ p {
     padding: 1rem;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fcfdff;
+    background: rgba(136, 167, 237, 0.06);
   }
 
   .sample-audio-panel h3 {
@@ -256,7 +272,7 @@ p {
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.75rem;
-    background: #fff;
+    background: var(--surface);
   }
 
   .sample-audio-item strong {

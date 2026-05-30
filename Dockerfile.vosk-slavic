@@ -1,0 +1,20 @@
+FROM alphacep/kaldi-vosk-server:latest
+
+ARG MODEL_URL
+ARG MODEL_DIRNAME
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN test -n "$MODEL_URL" && test -n "$MODEL_DIRNAME"
+
+RUN curl -fL "$MODEL_URL" -o /tmp/model.zip \
+    && unzip -q /tmp/model.zip -d /opt \
+    && mkdir -p /opt/vosk-model \
+    && mv "/opt/${MODEL_DIRNAME}" /opt/vosk-model/model \
+    && rm -f /tmp/model.zip
+
+EXPOSE 2700
+
+CMD ["python3", "/opt/vosk-server/websocket/asr_server.py", "/opt/vosk-model/model"]

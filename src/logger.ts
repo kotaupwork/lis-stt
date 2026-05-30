@@ -28,11 +28,11 @@ const LEVELS: Record<LogLevel, number> = {
 // ────────────────────────────────────────────────
 
 const C = {
-  debug: "\x1b[90m",  // gray
-  info:  "\x1b[94m",  // blue
-  warn:  "\x1b[93m",  // yellow
-  error: "\x1b[91m",  // red
-  bold:  "\x1b[1m",
+  debug: "\x1b[90m", // gray
+  info: "\x1b[94m", // blue
+  warn: "\x1b[93m", // yellow
+  error: "\x1b[91m", // red
+  bold: "\x1b[1m",
   reset: "\x1b[0m",
 } as const;
 
@@ -54,9 +54,15 @@ function getLogStream(): fs.WriteStream | null {
   if (_logStream) return _logStream;
   try {
     fs.mkdirSync(LOG_DIR, { recursive: true });
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")
+      .slice(0, 19);
     const logPath = path.join(LOG_DIR, `${SCRIPT_NAME}-${timestamp}.log`);
-    _logStream = fs.createWriteStream(logPath, { flags: "a", encoding: "utf-8" });
+    _logStream = fs.createWriteStream(logPath, {
+      flags: "a",
+      encoding: "utf-8",
+    });
     return _logStream;
   } catch {
     return null;
@@ -95,7 +101,7 @@ function log(level: LogLevel, msg: string): void {
 
 export const logger = {
   debug: (msg: string) => log("debug", msg),
-  info:  (msg: string) => log("info",  msg),
-  warn:  (msg: string) => log("warn",  msg),
+  info: (msg: string) => log("info", msg),
+  warn: (msg: string) => log("warn", msg),
   error: (msg: string) => log("error", msg),
 };

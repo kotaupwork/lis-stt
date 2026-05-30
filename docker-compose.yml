@@ -1,0 +1,60 @@
+services:
+  stt-frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/kotaupwork/lis-stt/frontend:v1.5}
+    container_name: lis-stt-frontend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      STT_BACKEND_URL: http://stt-backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - stt-backend
+    restart: unless-stopped
+
+  vosk-en:
+    image: alphacep/kaldi-en:latest
+    container_name: lis-stt-vosk-en
+    ports:
+      - "2700:2700"
+    restart: unless-stopped
+
+  vosk-sr:
+    profiles: ["sr"]
+    build:
+      context: .
+      dockerfile: Dockerfile.vosk-slavic
+      args:
+        MODEL_URL: ${VOSK_MODEL_URL_SR:-https://alphacephei.com/vosk/models/vosk-model-small-sr-0.4.zip}
+        MODEL_DIRNAME: ${VOSK_MODEL_DIRNAME_SR:-vosk-model-small-sr-0.4}
+    container_name: lis-stt-vosk-sr
+    ports:
+      - "2701:2700"
+    restart: unless-stopped
+
+  vosk-sh:
+    profiles: ["sh"]
+    build:
+      context: .
+      dockerfile: Dockerfile.vosk-slavic
+      args:
+        MODEL_URL: ${VOSK_MODEL_URL_SH:-https://alphacephei.com/vosk/models/vosk-model-small-sh-0.4.zip}
+        MODEL_DIRNAME: ${VOSK_MODEL_DIRNAME_SH:-vosk-model-small-sh-0.4}
+    container_name: lis-stt-vosk-sh
+    ports:
+      - "2702:2700"
+    restart: unless-stopped
+
+  stt-backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/kotaupwork/lis-stt/backend:v1.5}
+    container_name: lis-stt-backend
+    environment:
+      VOSK_DEFAULT_MODEL: en
+      VOSK_WS_URL_EN: ws://vosk-en:2700
+      VOSK_WS_URL_SR: ws://vosk-sr:2700
+      VOSK_WS_URL_SH: ws://vosk-sh:2700
+    ports:
+      - "8000:8000"
+    depends_on:
+      - vosk-en
+    restart: unless-stopped

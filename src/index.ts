@@ -17,12 +17,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/health", (_req, res) => {
-  res.status(200).json({ ok: true, service: config.appName, env: config.nodeEnv });
+  res
+    .status(200)
+    .json({ ok: true, service: config.appName, env: config.nodeEnv });
 });
 
 app.get("/", (_req, res) => {
   res.status(200).render("index", {
     appName: config.appName,
+    sttBackendUrl: config.sttBackendUrl,
     now: new Date().toLocaleString(),
   });
 });

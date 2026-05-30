@@ -1,7 +1,7 @@
 # Project Status
 
 > **Last updated:** 2026-05-28
-> **Version:** 0.1.0-dev
+> **Version:** 0.1.0-dev → 1.0.0-stt-dev (in progress)
 
 ---
 
@@ -14,6 +14,19 @@
 | `src/index.ts` | Express + route setup | ✅ Done | Full page + htmx fragment endpoints |
 | `src/views/index.ejs` | Full page view | ✅ Done | htmx trigger and target container |
 | `src/views/partials/time.ejs` | Fragment view | ✅ Done | Rendered by partial route |
+| `src/client/audio-recorder.js` | Audio capture + resampling | ✅ Done | MediaRecorder wrapper, 48→16 kHz conversion |
+| `src/client/web-speech.js` | Web Speech API wrapper | ✅ Done | Detection + unified result format |
+| `src/client/stt-manager.js` | Unified STT interface | ✅ Done | Web Speech API → Vosk fallback |
+| `src/client/stt.js` | STT browser initialization | ✅ Done | DOM event handlers, UI integration |
+| `backend/app.py` | Python FastAPI server | ✅ Done | HTTP + WebSocket routes implemented |
+| `backend/vosk_client.py` | Vosk WebSocket client | ✅ Done | Streams PCM chunks and normalizes Vosk results |
+| `backend/session_manager.py` | Session tracking | ✅ Done | Session-to-websocket fanout implemented |
+| `backend/audio_processor.py` | Audio buffering + silence | ✅ Done | 500ms chunk buffer and flush support |
+| `docker-compose.yml` | Service orchestration | ✅ Done | Vosk + STT backend stack |
+| `Dockerfile` | Backend container image | ✅ Done | FastAPI service image build |
+| `backend/tests/*` | Backend validation tests | ✅ Done | Buffering, normalization, health/transcribe basics |
+| `tools/generate_test_audio.py` | Test audio generator | ✅ Done | Generates SR/EN male/female mp3 files |
+| `src/public/audio-samples/*` | Sample audio fixtures | ✅ Done | 4 mp3 files for STT comparison checks |
 
 ---
 
@@ -38,6 +51,11 @@
 | A | Full page route (`/`) | ✅ Done | Server-rendered with EJS |
 | B | Fragment route (`/partials/time`) | ✅ Done | htmx-compatible partial response |
 | C | Health route (`/health`) | ✅ Done | JSON heartbeat for uptime checks |
+| D-1 | **Phase 1: Frontend Recording** | ✅ Done | Audio recorder + Web Speech API wrapper |
+| D-2 | **Phase 2: Backend STT Endpoints** | ✅ Done | FastAPI routes + Vosk client |
+| D-3 | **Phase 3: Docker Deployment** | ✅ Done | Docker Compose + Vosk service |
+| D-4 | **Phase 4: Integration & Testing** | ✅ Done | Retry logic, error UX, backend tests, endpoint resilience |
+| D-5 | **Sample Audio Workflow** | ✅ Done | Generated clips + UI controls for backend STT testing |
 
 ---
 
@@ -47,3 +65,11 @@
 |---|---|---|
 | 2026-05-28 | Used custom `logger.ts` | Consistent log levels, timestamps, file output |
 | 2026-05-28 | htmx-first server-rendered template | Practical default for progressive enhancement |
+| 2026-05-28 | Hybrid STT: Web Speech API + Vosk fallback | Best UX (native API when available) + always-available fallback (privacy-first) |
+| 2026-05-28 | Audio buffering at 500ms | Quality > speed; ~0.5s latency acceptable for voice input |
+| 2026-05-28 | HTTP POST (audio) + WebSocket (results) | Clean separation; POST stateless, WebSocket real-time HTMX-native |
+| 2026-05-28 | Python FastAPI backend + Docker Vosk | Best Vosk integration; Vosk service isolated; Node.js frontend stays |
+| 2026-05-28 | 500ms server chunking in backend | Quality-first buffering before Vosk streaming |
+| 2026-05-29 | Docker Compose for local STT stack | One-command startup for backend + Vosk service |
+| 2026-05-29 | Upload retries + status banner in STT UI | Better resilience and user feedback under network/backend failures |
+| 2026-05-29 | Added generated SR/EN sample clips and direct STT run buttons | Faster repeatable QA without manual recording |

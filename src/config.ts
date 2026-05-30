@@ -22,7 +22,11 @@
 export const config = {
   appName: process.env.APP_NAME ?? "my-htmx-app",
   port: parseInt(process.env.PORT ?? "3000", 10),
-  nodeEnv: (process.env.NODE_ENV ?? "development") as "development" | "production" | "test",
+  sttBackendUrl: process.env.STT_BACKEND_URL ?? "http://localhost:8000",
+  nodeEnv: (process.env.NODE_ENV ?? "development") as
+    | "development"
+    | "production"
+    | "test",
   logLevel: process.env.LOG_LEVEL ?? "info",
   // Add your project-specific config here, e.g.:
   // dbUrl: requireEnv("DATABASE_URL"),

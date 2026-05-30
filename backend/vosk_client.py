@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import Any
 
 import websockets
+from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
 
 
 class VoskClient:
@@ -18,7 +19,10 @@ class VoskClient:
 
     async def _ensure_connection(self, session_id: str) -> websockets.WebSocketClientProtocol:
         if session_id in self._connections:
-            return self._connections[session_id]
+            ws = self._connections[session_id]
+            if not ws.closed:
+                return ws
+            self._connections.pop(session_id, None)
 
         ws = await websockets.connect(self.url, max_size=None)
         await ws.send(json.dumps({"config": {"sample_rate": 16000}}))
@@ -32,17 +36,36 @@ class VoskClient:
         lock = self._locks[session_id]
         async with lock:
             ws = await self._ensure_connection(session_id)
-            await ws.send(pcm_chunk)
-            return await self._read_ready_messages(ws)
+            try:
+                await ws.send(pcm_chunk)
+                return await self._read_ready_messages(ws)
+            except ConnectionClosed:
+                # Reconnect once and retry the chunk.
+                self._connections.pop(session_id, None)
+                ws = await self._ensure_connection(session_id)
+                await ws.send(pcm_chunk)
+                return await self._read_ready_messages(ws)
 
     async def finalize(self, session_id: str) -> list[dict[str, Any]]:
         lock = self._locks[session_id]
         async with lock:
-            ws = await self._ensure_connection(session_id)
-            await ws.send(json.dumps({"eof": 1}))
-            results = await self._read_ready_messages(ws, timeout=0.5)
-            await ws.close()
-            self._connections.pop(session_id, None)
+            ws = self._connections.get(session_id)
+            if ws is None:
+                return []
+
+            try:
+                if not ws.closed:
+                    await ws.send(json.dumps({"eof": 1}))
+                results = await self._read_ready_messages(ws, timeout=0.8)
+            except ConnectionClosed:
+                results = []
+            finally:
+                try:
+                    if not ws.closed:
+                        await ws.close()
+                finally:
+                    self._connections.pop(session_id, None)
+
             return results
 
     async def _read_ready_messages(
@@ -54,6 +77,8 @@ class VoskClient:
             try:
                 raw = await asyncio.wait_for(ws.recv(), timeout=timeout)
             except asyncio.TimeoutError:
+                break
+            except (ConnectionClosedOK, ConnectionClosedError, ConnectionClosed):
                 break
 
             try:

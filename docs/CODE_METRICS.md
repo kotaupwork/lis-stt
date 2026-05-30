@@ -1,9 +1,9 @@
 # Code Metrics
 
-> **Generated:** 2026-05-28 15:32  
-> **Files scanned:** 4  
-> **Total code lines:** 342  
-> **Total size:** 14.61 KB  
+> **Generated:** 2026-05-29 23:45  
+> **Files scanned:** 17  
+> **Total code lines:** 1,433  
+> **Total size:** 52.33 KB  
 > **Code line limit per file:** 300  
 > **Files over limit:** 0
 
@@ -13,10 +13,23 @@
 
 | File | Total Lines | Code Lines | Avg Line Len | Size (KB) | Status |
 |------|-------------|------------|--------------|-----------|--------|
-| `src/config.ts` | 32 | 28 | 38.1 | 1.45 | ✅ |
-| `src/index.ts` | 41 | 32 | 32.1 | 1.04 | ✅ |
+| `backend/__init__.py` | 0 | 0 | 0.0 | 0.0 | ✅ |
+| `backend/app.py` | 202 | 170 | 36.1 | 6.52 | ✅ |
+| `backend/audio_processor.py` | 45 | 33 | 41.3 | 1.42 | ✅ |
+| `backend/session_manager.py` | 49 | 38 | 40.3 | 1.59 | ✅ |
+| `backend/tests/__init__.py` | 0 | 0 | 0.0 | 0.0 | ✅ |
+| `backend/tests/test_app.py` | 28 | 19 | 33.9 | 0.68 | ✅ |
+| `backend/tests/test_audio_processor.py` | 22 | 13 | 42.4 | 0.63 | ✅ |
+| `backend/tests/test_vosk_client.py` | 31 | 23 | 38.5 | 0.93 | ✅ |
+| `backend/vosk_client.py` | 123 | 100 | 38.5 | 4.1 | ✅ |
+| `src/client/audio-recorder.ts` | 247 | 201 | 29.8 | 6.71 | ✅ |
+| `src/client/stt-manager.ts` | 239 | 201 | 25.5 | 5.85 | ✅ |
+| `src/client/web-speech.ts` | 286 | 239 | 26.5 | 7.32 | ✅ |
+| `src/config.ts` | 33 | 29 | 39.3 | 1.52 | ✅ |
+| `src/index.ts` | 42 | 33 | 32.3 | 1.08 | ✅ |
 | `src/logger.ts` | 107 | 89 | 32.6 | 4.07 | ✅ |
 | `tools/analyze_scripts.py` | 251 | 193 | 34.7 | 8.05 | ✅ |
+| `tools/generate_test_audio.py` | 64 | 52 | 34.0 | 1.86 | ✅ |
 
 ---
 

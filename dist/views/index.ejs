@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= appName %></title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      window.STT_BACKEND_URL = "<%= sttBackendUrl %>";
+    </script>
+    <script type="module" src="/stt.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1><%= appName %></h1>
+      <p>Server-rendered starter with htmx partial updates.</p>
+
+      <section class="card">
+        <h2>Current Time</h2>
+        <div id="time-box" class="time-box">
+          <%- include("partials/time", { now }) %>
+        </div>
+        <button
+          class="btn"
+          hx-get="/partials/time"
+          hx-target="#time-box"
+          hx-swap="innerHTML"
+        >
+          Refresh Time
+        </button>
+      </section>
+      <section class="card">
+        <h2>Speech-to-Text</h2>
+        <div class="stt-info">
+          <p>
+            Mode: <span id="stt-mode" class="badge">Initializing...</span>
+          </p>
+          <div class="model-picker">
+            <label for="model-select">Vosk Model</label>
+            <select id="model-select" class="model-select">
+              <option value="en" selected>English (kaldi-en)</option>
+              <option value="sr">Serbian (vosk-model-small-sr-0.4)</option>
+              <option value="sh">Serbo-Croatian (vosk-model-small-sh-0.4)</option>
+            </select>
+            <p id="model-hint" class="model-hint">Checking backend model availability...</p>
+          </div>
+        </div>
+
+        <button
+          id="record-btn"
+          class="btn btn-primary"
+          onclick="window.sttAPI?.toggleRecording()"
+        >
+          🎤 Start Recording
+        </button>
+
+        <p id="stt-status" class="stt-status stt-status-info"></p>
+
+        <div class="sample-audio-panel">
+          <h3>Sample Audio Tests</h3>
+          <p class="sample-audio-hint">
+            These clips stream directly to the backend (Vosk path) so you can test
+            STT behavior without a microphone.
+          </p>
+
+          <div class="sample-audio-grid">
+            <div class="sample-audio-item">
+              <strong>Serbian Female</strong>
+              <audio controls src="/audio-samples/sr_female.mp3"></audio>
+              <button
+                class="btn sample-btn"
+                onclick="window.sttAPI?.runSample('/audio-samples/sr_female.mp3', 'Serbian Female')"
+              >
+                Run Through STT
+              </button>
+            </div>
+
+            <div class="sample-audio-item">
+              <strong>Serbian Male</strong>
+              <audio controls src="/audio-samples/sr_male.mp3"></audio>
+              <button
+                class="btn sample-btn"
+                onclick="window.sttAPI?.runSample('/audio-samples/sr_male.mp3', 'Serbian Male')"
+              >
+                Run Through STT
+              </button>
+            </div>
+
+            <div class="sample-audio-item">
+              <strong>English Female</strong>
+              <audio controls src="/audio-samples/en_female.mp3"></audio>
+              <button
+                class="btn sample-btn"
+                onclick="window.sttAPI?.runSample('/audio-samples/en_female.mp3', 'English Female')"
+              >
+                Run Through STT
+              </button>
+            </div>
+
+            <div class="sample-audio-item">
+              <strong>English Male</strong>
+              <audio controls src="/audio-samples/en_male.mp3"></audio>
+              <button
+                class="btn sample-btn"
+                onclick="window.sttAPI?.runSample('/audio-samples/en_male.mp3', 'English Male')"
+              >
+                Run Through STT
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="transcript-container" class="card transcript-box">
+          <h3>Transcription</h3>
+          <p id="transcript-interim" class="transcript-interim"></p>
+          <div id="transcript-final" class="transcript-final"></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

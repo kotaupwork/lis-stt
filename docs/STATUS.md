@@ -25,6 +25,8 @@
 | `docker-compose.yml` | Service orchestration | ✅ Done | Vosk + STT backend stack |
 | `Dockerfile` | Backend container image | ✅ Done | FastAPI service image build |
 | `backend/tests/*` | Backend validation tests | ✅ Done | Buffering, normalization, health/transcribe basics |
+| `tools/generate_test_audio.py` | Test audio generator | ✅ Done | Generates SR/EN male/female mp3 files |
+| `src/public/audio-samples/*` | Sample audio fixtures | ✅ Done | 4 mp3 files for STT comparison checks |
 
 ---
 
@@ -53,6 +55,7 @@
 | D-2 | **Phase 2: Backend STT Endpoints** | ✅ Done | FastAPI routes + Vosk client |
 | D-3 | **Phase 3: Docker Deployment** | ✅ Done | Docker Compose + Vosk service |
 | D-4 | **Phase 4: Integration & Testing** | ✅ Done | Retry logic, error UX, backend tests, endpoint resilience |
+| D-5 | **Sample Audio Workflow** | ✅ Done | Generated clips + UI controls for backend STT testing |
 
 ---
 
@@ -69,3 +72,4 @@
 | 2026-05-28 | 500ms server chunking in backend | Quality-first buffering before Vosk streaming |
 | 2026-05-29 | Docker Compose for local STT stack | One-command startup for backend + Vosk service |
 | 2026-05-29 | Upload retries + status banner in STT UI | Better resilience and user feedback under network/backend failures |
+| 2026-05-29 | Added generated SR/EN sample clips and direct STT run buttons | Faster repeatable QA without manual recording |
